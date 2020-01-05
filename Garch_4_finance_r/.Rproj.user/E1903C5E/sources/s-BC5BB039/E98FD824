@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1578256869697.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2892697155",
+    "id" : "E98FD824",
+    "lastKnownWriteTime" : 1578256886,
+    "last_content_update" : 1578256886329,
+    "path" : "C:/Users/BrunoHS/Desktop/AM/Blogdown_pre/Garch_4_finance_r/garching_4_finance.Rmd",
+    "project_path" : "garching_4_finance.Rmd",
+    "properties" : {
+        "cursorPosition" : "1,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
