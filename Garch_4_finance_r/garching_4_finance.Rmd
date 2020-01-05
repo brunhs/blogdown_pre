@@ -1,30 +1,40 @@
 ---
-title: "Garching around"
+title: "Garching our way out"
+subtitle: 'Univariate time series analysis with our beloved R'
+slug: univariate-sherlock-series-analysis
 author: "Bruno Schock"
-date: "05/01/2020"
-output: html_document
+date: "2020-01-12"
+categories: []
+tags: 
+  - prediction
+  - R
+  - time series
+output:
+  html_document:
+    toc: yes
+    number_sections: yes
+    theme: cosmo
+    highlight: tango
 ---
 
+
+
+
+# **Volatility, "Xeroque" and the unnecessary complexity**
+
+## **Simple matter**
+ 
+Hello everyone, it's your boy Brun here, like always i've been doing many courses around, many things going on now that I moved to a new city, with a new job, new perspectives, life is being pretty volatile, you know? Do you know something that's pretty volatile too? Stocks! Yeah boy, they move pretty fast and with a very non-gentile pattern, but fortunately the world gave us some time series analysis and here we are.
+
+Of course we are going to work with some price returns, do you know something better than returns? They're pretty good talking about the recent past, they can help us being more rich (time is money works here?), well, since we already talked about some time series in previous posts, in a small piece of how to predict with some different models, we're going to talk about some volatility estimation, something that can concern us, right? Trying to imagine if some time series is going to behave more volatile in the next future is something pretty good for us, since we can protect ourselves of these movements, no more chatting, let's begin. 
+ 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#Loading our packages
+
+
+
+
+
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

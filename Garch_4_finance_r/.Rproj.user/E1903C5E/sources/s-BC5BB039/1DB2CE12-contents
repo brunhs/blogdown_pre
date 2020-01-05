@@ -1,0 +1,357 @@
+---
+title: "echarts4r"
+author: "Brun"
+date: "July 9, 2019"
+output:
+  html_document:
+    toc: yes
+    number_sections: yes
+    theme: cosmo
+    highlight: tango
+---
+# **Echarts AWESOME graphics**
+
+## **The secret library society**
+ 
+ Hello everyone, it's your boy Brun here, and these days i've seen many kernels talking about good graphics practices, involving dynamic graphics in plotly and many other types of techniques, but I didn't find a kernel about a AWESOME library that has a GREAT comunity online with many examples running around, and with little lines of code can reproduce a great visualization for your kernel/job/project.
+ 
+ Since I work in a small company, I need to fill many gaps in a project, by doing all the data extraction untill the final product itself (the visualization), and in many ocasions I work with this library, since it can make a fast beautiful chart!
+ 
+
+
+```{r setup, message=FALSE, echo=FALSE}
+
+#Many libraries to make it!
+library(data.table)
+library(xts)
+library(openair)
+library(stringr)
+library(htmlwidgets)
+library(webshot)
+library(billboarder)
+library(echarts4r)
+library(rAmCharts)
+library(readxl)
+
+#GO!
+
+dataf = data.frame(read_xlsx('../input/dataf.xlsx', sheet=1))[,-1]
+datafipca = data.frame(read_xlsx('../input/datafipca.xlsx', sheet=1))[,-1]
+datafcamb = data.frame(read_xlsx('../input/datafcamb.xlsx', sheet=1))[,-1]
+datafselic = data.frame(read_xlsx('../input/datafselic.xlsx', sheet=1))[,-1]
+
+
+ef1 <- dataf %>% 
+  e_charts(date, width="100%", height=200) %>% # initialise and set x
+  e_line("X2019", color="#194f6e", name='2019') %>%  # add a line
+  e_line("X2020", color="#b1254c", name='2020') %>%  # add a line
+  e_line("X2021", color="#e7b800", name='2021') %>%  # add a line
+  e_line("X2022", color="black", name='2022') %>%  # add a line
+  e_title("GDP", "% of growth", #Add title & subtitle
+          textStyle=list(fontFamily="arial",
+                         fontWeight="bold",
+                         color="#4d4d4d"),
+          subtextStyle=list(fontFamily="arial",
+                            fontWeight="lighter")) %>%  # Add title & subtitle
+  e_theme("default") %>%  # theme
+  e_legend(bottom = 0, textStyle=list(fontFamily="arial"),
+          selected = list('2021' = FALSE, #Start graphic unselected
+                           '2022' = FALSE)) %>% # move legend to the bottom
+  e_tooltip(trigger="axis",
+            axisPointer = list(
+              type = "cross"),
+            textStyle=list(fontFamily="arial",
+                           fontSize=12)
+  ) %>%
+  #  e_tooltip_item_formatter(style = c("percent")) %>%
+  e_animation(duration=3000)%>%
+  e_y_axis(serie = 1, margin= 4)%>%
+  e_text_style(fontFamily = "Roboto")%>% 
+  e_group("4charts")%>%
+  e_format_x_axis("x", nameTextStyle=list(fontFamily="arial")) %>%
+  e_x_axis(serie = 1, margin= 4, 
+           axisLabel=list(fontFamily="arial"))
+
+
+
+ef2 <- datafipca %>% 
+  e_charts(date, width="100%", height=200) %>% # initialise and set x
+  e_line("X2019", color="#194f6e", name='2019') %>%  # add a line
+  e_line("X2020", color="#b1254c", name='2020') %>%  # add a line
+  e_line("X2021", color="#e7b800", name='2021') %>%  # add a line
+  e_line("X2022", color="black", name='2022') %>%  # add a line
+  e_title("Inflation", "Last 5 days updated", # Add title & subtitle
+          textStyle=list(fontFamily="arial",
+                         fontWeight="bold",
+                         color="#4d4d4d"),
+          subtextStyle=list(fontFamily="arial",
+                            fontWeight="lighter")) %>%  # Add title & subtitle
+  e_theme("default") %>%  # theme
+  e_legend(bottom = 0, textStyle=list(fontFamily="arial"),
+          selected = list('2021' = FALSE, #Start graphic unselected
+                           '2022' = FALSE)) %>% # move legend to the bottom
+  e_tooltip(trigger="axis",
+            axisPointer = list(
+              type = "cross"),
+            textStyle=list(fontFamily="arial",
+                           fontSize=12)
+  ) %>%
+  #  e_tooltip_item_formatter(style = c("percent")) %>%
+  e_animation(duration=3000)%>%
+  e_y_axis(serie = 1, margin= 4)%>%
+  e_text_style(fontFamily = "Roboto")%>% 
+  e_group("4charts")%>%
+  e_format_x_axis("x", nameTextStyle=list(fontFamily="arial")) %>%
+  e_x_axis(serie = 1, margin= 4, 
+           axisLabel=list(fontFamily="arial"))
+
+
+ef3 <- datafcamb %>% 
+  e_charts(date, width="100%", height=200) %>% # initialise and set x
+  e_line("X2019", color="#194f6e", name='2019') %>%  # add a line
+  e_line("X2020", color="#b1254c", name='2020') %>%  # add a line
+  e_line("X2021", color="#e7b800", name='2021') %>%  # add a line
+  e_line("X2022", color="black", name='2022') %>%  # add a line
+  e_title("Exchange rate", "End of the period (R$/US$)",   # Add title & subtitle
+          textStyle=list(fontFamily="arial",
+                         fontWeight="bold",
+                         color="#4d4d4d"),
+          subtextStyle=list(fontFamily="arial",
+                            fontWeight="lighter")) %>%  # Add title & subtitle
+  e_theme("default") %>%  # theme
+  e_legend(bottom = 0, textStyle=list(fontFamily="arial"),
+          selected = list('2021' = FALSE, #Start graphic unselected
+                           '2022' = FALSE)) %>% # move legend to the bottom
+  e_tooltip(trigger="axis",
+            axisPointer = list(
+              type = "cross"), 
+            textStyle=list(fontFamily="arial",
+                           fontSize=12)
+  ) %>%
+  #  e_tooltip_item_formatter(style = c("percent")) %>%
+  e_animation(duration=3000) %>%
+  e_y_axis(serie = 1, margin= 4)%>%
+  e_text_style(fontFamily = "Roboto")%>% 
+  e_group("4charts")%>%
+  e_format_x_axis("x", nameTextStyle=list(fontFamily="arial")) %>%
+  e_x_axis(serie = 1, margin= 4, 
+           axisLabel=list(fontFamily="arial"))
+
+
+ef4 <- datafselic %>% 
+  e_charts(date, width="100%", height=200) %>% # initialise and set x
+  e_line("X2019", color="#194f6e", name='2019') %>%  # add a line
+  e_line("X2020", color="#b1254c", name='2020') %>%  # add a line
+  e_line("X2021", color="#e7b800", name='2021') %>%  # add a line
+  e_line("X2022", color="black", name='2022') %>%  # add a line
+  e_title("Selic rate meta", "End of period (% per year)",
+          textStyle=list(fontFamily="arial",
+                         fontWeight="bold",
+                         color="#4d4d4d"),
+          subtextStyle=list(fontFamily="arial",
+                            fontWeight="lighter")) %>%  # Add title & subtitle
+  e_theme("default") %>%  # theme
+  e_legend(bottom = 0, textStyle=list(fontFamily="arial"),
+          selected = list('2021' = FALSE, #Start graphic unselected
+                           '2022' = FALSE)) %>% # move legend to the bottom
+  e_tooltip(trigger="axis",
+            axisPointer = list(
+              type = "cross"), show=T, 
+            textStyle=list(fontFamily="arial",
+                           fontSize=12)
+  ) %>%
+  #  e_tooltip_item_formatter(style = c("percent")) %>%
+  e_animation(duration=3000) %>%
+  e_connect_group("4charts")%>%
+  e_y_axis(serie = 1, margin= 4) %>%
+  e_text_style(fontFamily = "roboto") %>% 
+  e_group("4charts") %>%
+  e_format_x_axis("x", nameTextStyle=list(fontFamily="arial")) %>%
+  e_x_axis(serie = 1, margin= 4, 
+           axisLabel=list(fontFamily="arial"))
+
+
+e_arrange(ef1, ef2, ef3, ef4, rows=2, cols=2)
+
+```
+
+ ## **Share the love**
+ 
+ I know you already seen the title of this kernel but I must repeat, the library is called Echarts, and can be found in many places in our marvelous internet society, and if you are asking yourself 'Where can I find it Brun?', here are some examples:
+ 
+ Github: https://github.com/apache/incubator-echarts
+ 
+ In this link you can find all it's extensions, and by searching in that extensions you can find many, and I really say many examples.
+ 
+ So, by now you are excited and full of happiness (may be not) and want to start this kernel tutorial fast as you can so you can use this awesomes visualizations in your projects, so let's get it on!
+ 
+ But first, let me make some observations. In this many parts tutorial (I'm hopping to do many of these, but that's just a matter if you like this one, so if this helps you in any way, share your love and I'll really try my best to build a entire course around this library) I'm going to do around the R language (calm down 'ma boyeee', I'll work in a python version too, of course, if you like this one) since it's a great language for those who work with statistics and visualizations. The package in R is built by John Coene (you can find him pretty easily, share some love), I don't know him personally but he seems to be a great programmer with a open heart, so thank you John (much love).
+ 
+ ## **Lock 'n loaded**
+ 
+ So as you we are used to, our first step is to load the package and others auxiliar libraries. For our main purposes i'll be working with the Diamonds (from ggplot2) dataset here, it's a pretty simple dataset that maybe can fill many of our dynamic data showing purposes.
+ 
+```{r}
+
+
+library(echarts4r) #Our badass package
+library(ggplot2) #For the diamonds dataset
+library(IRdisplay) #For our displays
+
+
+#Our dataset is too big, lets take a part of it
+data = dplyr::sample_n(diamonds, 1000)
+
+head(data)
+
+#Voil�!
+```
+
+## **Shine bright like a diamond** 
+ 
+ So, let's see how this library works, and explore some basics before we can start with more complicated parameters, what about some scatterplots? Basically you must build a dataframe containing the data you're trying to plot (as always), keeping it's labels specified so the package recognize the format you're attributing to it. So let's say you want to build a simple scatterplot of our data.
+ 
+ 
+```{r}
+
+
+e1 <-  data %>% 
+  group_by(clarity) %>%  #Grouping the data by the clarity atribute
+  e_charts(
+    carat,
+    elementId = "chart", width="100%", height=300
+  ) %>% 
+  e_scatter(price) #Scattering the price
+
+e1
+
+```
+
+
+Kaplow! Pretty simple code and such a beautiful graphic for our first attempt, huh? Let's explore some more basics, and after that try to make it looks better and unite them. Second stop is a linechart.
+
+
+```{r}
+e2 <- data %>% 
+  group_by(clarity) %>%
+  e_charts(carat, width="100%", height=300) %>% 
+  e_line(depth)
+
+e2
+
+```
+
+
+
+Ding ding ding! As you see until here, easy cheesy, the data structuration is almost the same in all cases, so what can we modify in a way to improve it? Well, it seems that our data is out of the Y axis parameters, so I'm going to adjust it and some other stuff too. There are several parameters that can be added, as I'm adding them I'm going to explain what each one are doing.
+
+
+```{r}
+
+e3 <-data %>% 
+  group_by(clarity) %>%  #Grouping the data by the clarity atribute
+  e_charts(
+    carat, width="100%", height=300
+  ) %>% 
+  e_scatter(price, size=table)%>% #Adding the size of points related to the table value
+  e_datazoom(show = FALSE, y_index = 0) %>%  #Adding zoom option
+  e_legend(FALSE) %>%  #Removing legends
+  e_title("Shine bright line a diamond") %>% #Adding a title
+  e_tooltip(
+    trigger = "item" #How do you want to trigger the tooltip?
+  ) %>% 
+  e_text_style(fontFamily = "Arial") #Select the text font style
+
+e4 <-data %>% 
+  group_by(clarity) %>%
+  e_charts(carat, width="100%", height=300) %>% 
+  e_line(depth) %>% #Adding a line
+  e_datazoom(y_index = 0) %>%  #The zooming tab
+  e_y_axis(min = 51) %>% #Y axis limits
+  e_title("Beautiful Like Diamonds in the Sky") %>%
+  e_legend(
+    bottom = 5 #Legend position
+  ) %>% 
+  e_tooltip(
+    trigger = "item" #The trigger
+  ) %>% 
+  e_text_style(fontFamily = "Arial") #Again the text font 
+
+
+e_arrange(e3, e4)
+
+```
+
+ 
+"But Brun, I would like to add more things! How can I see what else can be made?" That's pretty easy my fellow friend, you can check it in the library pdf here:
+ 
+https://cran.r-project.org/web/packages/echarts4r/echarts4r.pdf
+ 
+But in reality, for a more advanced approach on how to work with the functions is by looking at the original site here:
+ 
+https://echarts.apache.org/en/option.html#title
+ 
+ 
+And John's site of the package too:
+ 
+https://echarts4r.john-coene.com/index.html
+
+
+## **Building interactive charts** 
+
+One of the best things around Javascript formulated libraries is the interactive possibilities it gives us, more than a single interaction, making it multi-interactive it's great for impressing that company for a good job application (people love shiny dinamyc graphics), so let's do it! Make them smaller so it's easier to see the interaction and keep it simple (for now).
+
+
+```{r}
+
+
+e5 <- data %>% 
+  group_by(clarity) %>% 
+  e_charts(
+    carat, width="100%", height=300
+  ) %>% 
+  e_connect("chart") %>%
+  e_scatter(price, carat, size=table) %>% 
+  e_datazoom(show = FALSE, y_index = 0) %>% 
+  e_legend(FALSE,
+          selected = list('I1' = FALSE, #Start graphic unselected
+                           'SI2' = FALSE)) %>% 
+  e_title("Shine Bright Like a Diamond") %>% 
+  e_tooltip(
+    trigger = "item"
+  ) %>% 
+  e_text_style(fontFamily = "Arial")
+
+
+e6 = data %>% 
+  group_by(clarity) %>%
+  e_charts(carat, width="100%", height=300) %>% 
+  e_line(depth) %>% 
+  e_connect("chart") %>% 
+  e_datazoom(y_index = 0) %>% 
+  e_title("Beautiful Like Diamonds in the Sky") %>%
+  e_y_axis(min = 51) %>% 
+  e_legend(
+    bottom = 5,
+          selected = list('I1' = FALSE, #Start graphic with unselected
+                           'SI2' = FALSE)) %>%
+  e_tooltip(
+    trigger = "item"
+  ) %>% 
+  e_text_style(fontFamily = "Arial")
+
+
+e_arrange(e5, e6) #Arranging them in the same graph, sharing data
+
+
+```
+
+
+
+
+## **Final statements** 
+ 
+Gentleman, we have a powerfull library here, with many possibilities, this is just a tip of what can be done with these Javascript graphics, I already used it in many different ocasions and for a fast dynamic visualization it worth a lot! 
+ 
+Let me hear what you have to say, write down below your thoughts about what you see here, any advice for future implementations? Any dataset request? I'm still upgrading this kernel and by little pieces it'll become a great place for you and many others who need to work in dynamic visualizations! If you want more versions of this, please let me know it, since I already prepared some material, it'll be a honor to share with you! Peace!
+
