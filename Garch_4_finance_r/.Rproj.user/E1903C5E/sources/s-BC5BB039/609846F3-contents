@@ -29,9 +29,9 @@ Hello everyone, it's your boy Brun here, like always i've been doing many course
 Of course we are going to work with some price returns, do you know something better than returns? They're pretty good talking about the recent past, they can help us being more rich (time is money works here?), well, since we already talked about some time series in previous posts, in a small piece of how to predict with some different models, we're going to talk about some volatility estimation, something that can concern us, right? Trying to imagine if some time series is going to behave more volatile in the next future is something pretty good for us, since we can protect ourselves of these movements, no more chatting, let's begin. 
  
 
-```{r setup, include=FALSE}
+```{r, include=TRUE, message=FALSE, warning=FALSE}
 #Loading our packages
-
+library(PerformanceAnalytics)
 
 
 
@@ -40,21 +40,53 @@ Of course we are going to work with some price returns, do you know something be
 
 
 
+## **Get the data, 'bo1s' and 'g4ls'**
+
+Yeah, this chunk is to get the data and plot it, you know we can't keep without it!
 
 
-```{r setup, include=FALSE}
+```{r, include=TRUE, message=FALSE, warning=FALSE}
 #Loading our stocks
-install.packages("quantmod")
+#install.packages("quantmod")
 library(quantmod)
+library(ggplot2)
 
 pbr <- getSymbols("PBR", src = "yahoo", from = "2013-01-01", to = "2020-01-01", auto.assign = FALSE)
 
 
-ggplot(pbr, aes(x = index(pbr), y = pbr[,6])) + geom_line(color = "darkblue") + ggtitle("Petrobras prices series") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months")
+#ggplot(pbr, aes(x = index(pbr), y = pbr[,6])) + geom_line(color = "darkblue") + ggtitle("Petrobras prices series") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months")
+
+plot(pbr[,6], main = 'Petrobras prices')
+
 
 ```
 
 
 
+It, seems ok, let's take a look at the returns
 
 
+```{r, include=TRUE, message=FALSE, warning=FALSE}
+
+pbr_ret = CalculateReturns(pbr[,6])
+
+plot(pbr_ret, main = 'Petrobras returns')
+
+#Honey in the chupet
+
+```
+
+
+
+## Do you even GARCH?
+
+
+```{r, include=TRUE, message=FALSE, warning=FALSE}
+
+pbr_ret = CalculateReturns(pbr[,6])
+
+plot(pbr_ret, main = 'Petrobras returns')
+
+#Honey in the chupet
+
+```

@@ -1,0 +1,12 @@
+"0","#Loading our packages"
+"0","library(PerformanceAnalytics)"
+"2","package ‘PerformanceAnalytics’ was built under R version 3.6.2"
+"2","
+Attaching package: ‘PerformanceAnalytics’
+
+"
+"2","The following object is masked from ‘package:graphics’:
+
+    legend
+
+"
