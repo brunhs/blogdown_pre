@@ -88,8 +88,9 @@ acf(abs(e))
 
 
 # Compute the predicted variances
+predvar = data.frame(rep(NA, length(pbr_ret)))
 predvar[1] <- var(sp500ret) 
-for(t in 2:nobs){
+for(t in 2:length(pbr_ret)){
    predvar[t] <- omega + alpha * e2[t-1] + beta * predvar[t-1]
 }
 

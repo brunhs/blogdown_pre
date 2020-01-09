@@ -1,0 +1,3 @@
+"0","# Plot the acf of the absolute prediction errors"
+"0","acf(abs(e))"
+"0",""

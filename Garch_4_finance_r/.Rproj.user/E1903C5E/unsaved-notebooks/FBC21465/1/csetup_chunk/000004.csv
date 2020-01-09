@@ -1,0 +1,6 @@
+"0","for(t in 2:length(pbr_ret)){
+   predvar[t] <- omega + alpha * e2[t-1] + beta * predvar[t-1]
+}
+"
+"2","Error in omega : object 'omega' not found
+"

@@ -1,0 +1,5 @@
+"0",""
+"0",""
+"0","# Compute the rolling 3 months estimate of annualized volatility"
+"0","chart.RollingPerformance(R = pbr_ret[""2000::2020""], width = 66,"
+"0","     FUN = 'sd.annualized', scale = 252, main = ""Three months rolling volatility"")"

@@ -52,9 +52,9 @@ library(quantmod)
 library(ggplot2)
 
 pbr <- getSymbols("PBR", src = "yahoo", from = "2013-01-01", to = "2020-01-01", auto.assign = FALSE)
+```
 
-
-#ggplot(pbr, aes(x = index(pbr), y = pbr[,6])) + geom_line(color = "darkblue") + ggtitle("Petrobras prices series") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months")
+```{r, echo=FALSE}
 
 plot(pbr[,6], main = 'Petrobras prices')
 
@@ -70,9 +70,87 @@ It, seems ok, let's take a look at the returns
 
 pbr_ret = CalculateReturns(pbr[,6])
 
+#Honey in the chupet
+
+```
+
+```{r, echo=FALSE}
+
 plot(pbr_ret, main = 'Petrobras returns')
 
-#Honey in the chupet
+
+```
+
+
+
+```{r, message=FALSE, include=TRUE}
+
+
+# Compute the rolling 1 month estimate of annualized volatility
+chart.RollingPerformance(R = pbr_ret["2000::2020"], width = 22,
+     FUN = "sd.annualized", scale = 252, main = "One month rolling volatility")
+
+```
+
+
+```{r, echo=FALSE}
+
+
+# Compute the rolling 3 months estimate of annualized volatility
+chart.RollingPerformance(R = pbr_ret["2000::2020"], width = 66,
+     FUN = 'sd.annualized', scale = 252, main = "Three months rolling volatility")
+
+
+```
+
+
+```{r, message=FALSE}
+
+
+
+# Compute the mean daily return
+m <- mean(data.frame(data=pbr_ret , coredata(pbr_ret))[,1], na.rm = TRUE)
+
+# Define the series of prediction errors
+e <- data.frame(data=pbr_ret , coredata(pbr_ret))[-1,1] - m
+
+# Plot the absolute value of the prediction errors
+par(mfrow = c(2,1),mar = c(3, 2, 2, 2))
+plot(abs(e))
+
+
+```
+
+```{r, message=FALSE}
+# Plot the acf of the absolute prediction errors
+acf(abs(e))
+
+```
+
+
+```{r, message=FALSE}
+
+
+
+
+
+# Specify a standard GARCH model with constant mean
+garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
+                         variance.model = list(model = "sGARCH"), 
+                         distribution.model = "norm")
+
+# Estimate the model
+garchfit <- ugarchfit(data = sp500ret, spec = garchspec)
+
+# Use the method sigma to retrieve the estimated volatilities 
+garchvol <- sigma(garchfit)
+
+# Plot the volatility for 2017
+plot(garchvol["2017"])
+
+
+
+
 
 ```
 
@@ -83,9 +161,8 @@ plot(pbr_ret, main = 'Petrobras returns')
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE}
 
-pbr_ret = CalculateReturns(pbr[,6])
 
-plot(pbr_ret, main = 'Petrobras returns')
+
 
 #Honey in the chupet
 
