@@ -4,7 +4,3 @@
 "0","library(ggplot2)"
 "0",""
 "0","pbr <- getSymbols(""PBR"", src = ""yahoo"", from = ""2013-01-01"", to = ""2020-01-01"", auto.assign = FALSE)"
-"0",""
-"0",""
-"0","#ggplot(pbr, aes(x = index(pbr), y = pbr[,6])) + geom_line(color = ""darkblue"") + ggtitle(""Petrobras prices series"") + xlab(""Date"") + ylab(""Price"") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = ""%b %y"", date_breaks = ""6 months"")"
-"0",""

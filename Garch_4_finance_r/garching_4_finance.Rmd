@@ -130,8 +130,8 @@ acf(abs(e))
 
 ```{r, message=FALSE}
 
-
-
+#Our beloved package
+library(rugarch)
 
 
 # Specify a standard GARCH model with constant mean
@@ -140,23 +140,19 @@ garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
                          distribution.model = "norm")
 
 # Estimate the model
-garchfit <- ugarchfit(data = sp500ret, spec = garchspec)
+garchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
 
 # Use the method sigma to retrieve the estimated volatilities 
 garchvol <- sigma(garchfit)
 
-# Plot the volatility for 2017
-plot(garchvol["2017"])
+# Plotting our model volatility
+plot(garchvol)
 
 
 
 
 
 ```
-
-
-
-## Do you even GARCH?
 
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE}
@@ -164,6 +160,197 @@ plot(garchvol["2017"])
 
 
 
-#Honey in the chupet
+# Compute unconditional volatility
+sqrt(uncvariance(garchfit))
+
+# Print last 10 ones in garchvol
+tail(garchvol, 10)
+
+# Forecast volatility 5 days ahead and add 
+garchforecast <- ugarchforecast(fitORspec = garchfit, 
+                     n.ahead = 5)
+
+# Extract the predicted volatilities and print them
+print(sigma(garchforecast))
+
+
+
+
+
+# Compute the annualized volatility
+annualvol <- sqrt(252) * sigma(garchfit)
+
+# Compute the 5% vol target weights  
+vt_weights <- 0.05 / annualvol
+
+# Compare the annualized volatility to the portfolio weights in a plot
+plot(merge(annualvol, vt_weights), multi.panel = TRUE)
+
 
 ```
+
+
+
+
+```{r}
+
+
+
+# Plot the return series
+plot(pbr_ret)
+
+# Specify the garch model to be used
+garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
+                       variance.model = list(model = "sGARCH"),
+                        distribution.model = 'sstd')
+
+# Estimate the model
+garchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
+
+# Inspect the coefficients
+coef(garchfit)
+
+
+
+
+
+
+
+
+
+
+```
+
+
+```{r, warning=FALSE}
+
+
+
+
+
+
+
+
+# Compute the standardized returns
+stdret <- residuals(garchfit, standardize = TRUE)
+
+# Compute the standardized returns using fitted() and sigma()
+stdret <- (pbr_ret - fitted(garchfit)) / sigma(garchfit)
+
+# Load the package PerformanceAnalytics and make the histogram
+library(PerformanceAnalytics)
+chart.Histogram(stdret, methods = c("add.normal","add.density" ), 
+                colorset = c("gray","red","blue"))
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+# Specify the GJR GARCH model
+garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
+                 variance.model = list(model = 'gjrGARCH'),
+                 distribution.model = 'sstd')
+
+# Estimate the model and compute volatility
+gjrgarchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
+gjrgarchvol <- sigma(gjrgarchfit)
+
+# Compare volatility
+plotvol <- plot(abs(pbr_ret[-1]), col = "grey")
+plotvol <- addSeries(gjrgarchvol, col = "red", on=1)
+plotvol <- addSeries(sigma(garchfit), col = "blue", on=1)
+plotvol
+
+
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+
+
+
+
+# Specify AR(1)-GJR GARCH model
+garchspec <- ugarchspec(mean.model = list(armaOrder = c(1,2) ),
+                        variance.model = list(model = "gjrGARCH"),
+                        distribution.model = "sstd")
+
+# Estimate the model
+garchfit <- ugarchfit(data=pbr_ret[-1],spec = garchspec, mean.model=c(1,0))
+
+# Print the first two coefficients
+coef(garchfit)[c(1:2)]
+
+
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+
+
+
+```
+
+
+
+
