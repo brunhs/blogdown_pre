@@ -1,6 +1,0 @@
-"0","#Loading our stocks"
-"0","#install.packages(""quantmod"")"
-"0","library(quantmod)"
-"0","library(ggplot2)"
-"0",""
-"0","pbr <- getSymbols(""PBR"", src = ""yahoo"", from = ""2013-01-01"", to = ""2020-01-01"", auto.assign = FALSE)"

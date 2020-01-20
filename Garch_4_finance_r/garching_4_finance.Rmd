@@ -1,5 +1,5 @@
 ---
-title: "Garching our way out"
+title: "Garching our way out - Part I"
 subtitle: 'Univariate time series analysis with our beloved R'
 slug: univariate-sherlock-series-analysis
 author: "Bruno Schock"
@@ -22,9 +22,46 @@ output:
 
 # **Volatility, "Xeroque" and the unnecessary complexity**
 
+
+
+
+```{r, include=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
+library(PerformanceAnalytics)
+library(quantmod)
+library(ggplot2)
+library(rugarch)
+
+pbr <- getSymbols("PBR", src = "yahoo", from = "2013-01-01", to = "2020-01-01", auto.assign = FALSE)
+pbr_ret = CalculateReturns(pbr[,6])
+
+
+# Specify the GJR GARCH model
+garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
+                 variance.model = list(model = 'gjrGARCH'),
+                 distribution.model = 'sstd')
+
+# Estimate the model and compute volatility
+gjrgarchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
+gjrgarchvol <- sigma(gjrgarchfit)
+
+# Compare volatility
+plotvol <- plot(abs(pbr_ret[-1]), col = "grey", main = 'Returns volatilty estimation')
+plotvol <- addSeries(gjrgarchvol, col = "blue", on=1)
+#plotvol <- addSeries(sigma(garchfit), col = "blue", on=1)
+plotvol
+
+
+
+
+
+```
+
+
+
+
 ## **Simple matter**
  
-Hello everyone, it's your boy Brun here, like always i've been doing many courses around, many things going on now that I moved to a new city, with a new job, new perspectives, life is being pretty volatile, you know? Do you know something that's pretty volatile too? Stocks! Yeah boy, they move pretty fast and with a very non-gentile pattern, but fortunately the world gave us some time series analysis and here we are.
+Hello everyone, it's your boy Brun here, like always i've been doing many courses around, many things going on now that I moved to a new city, with a new job, new perspectives, life is being pretty volatile, you know? Do you know something that's pretty volatile too (Y0 m4m4! Just joking)?  Stocks! Yeah boy, they move pretty fast and with a very non-gentile pattern, but fortunately the world gave us some time series analysis and here we are.
 
 Of course we are going to work with some price returns, do you know something better than returns? They're pretty good talking about the recent past, they can help us being more rich (time is money works here?), well, since we already talked about some time series in previous posts, in a small piece of how to predict with some different models, we're going to talk about some volatility estimation, something that can concern us, right? Trying to imagine if some time series is going to behave more volatile in the next future is something pretty good for us, since we can protect ourselves of these movements, no more chatting, let's begin. 
  
@@ -54,6 +91,9 @@ library(ggplot2)
 pbr <- getSymbols("PBR", src = "yahoo", from = "2013-01-01", to = "2020-01-01", auto.assign = FALSE)
 ```
 
+Good old returns, as you can see, everything looks nice and ready for our analysis.
+
+
 ```{r, echo=FALSE}
 
 plot(pbr[,6], main = 'Petrobras prices')
@@ -81,6 +121,10 @@ plot(pbr_ret, main = 'Petrobras returns')
 
 ```
 
+Do not forget, boys, when you're calculating returns, you are losing one degree of freedom, so the first price in your dataset is going to be null, mmk?
+
+Now, daily returns seems pretty noisy and hard to analyse, here you may want some denoising in your data. The literature here talks about many different ways in capturing the signal of the returns, in this specific case we're going to use the rolling volatility of the returns. Another one that you could make is the exponential smooth for example, it's pretty common in daily data analysis.
+
 
 
 ```{r, message=FALSE, include=TRUE}
@@ -104,29 +148,39 @@ chart.RollingPerformance(R = pbr_ret["2000::2020"], width = 66,
 ```
 
 
+Now we got it! Can you feel? Can you see? I see trends, and as far as we want, capturing trends of volatility seems a good stuff, remember, we are trying to look our next step volatility, how does it looks like? It's going to be going up or down?
+
+Take a look at our errors, how they behave?
+
+
 ```{r, message=FALSE}
 
 
 
 # Compute the mean daily return
-m <- mean(data.frame(data=pbr_ret , coredata(pbr_ret))[,1], na.rm = TRUE)
+m <- mean(pbr_ret[-1])
 
 # Define the series of prediction errors
-e <- data.frame(data=pbr_ret , coredata(pbr_ret))[-1,1] - m
+e <- pbr_ret[-1,1] - m
 
 # Plot the absolute value of the prediction errors
-par(mfrow = c(2,1),mar = c(3, 2, 2, 2))
-plot(abs(e))
+plot(abs(e), main = "Absolute errors")
 
 
 ```
+
+Let's take a look at the autocorrelation function
+
+
+
 
 ```{r, message=FALSE}
 # Plot the acf of the absolute prediction errors
-acf(abs(e))
+acf(abs(e), main = "Absolute errors ACF")
 
 ```
 
+## **Finally let's garch**
 
 ```{r, message=FALSE}
 
@@ -154,18 +208,24 @@ plot(garchvol)
 
 ```
 
+Oh great, how does it seems in numbers?
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE}
-
-
-
 
 # Compute unconditional volatility
 sqrt(uncvariance(garchfit))
 
 # Print last 10 ones in garchvol
 tail(garchvol, 10)
+```
 
+
+
+
+
+# **Prediction time!**
+
+```{r, include=TRUE, message=FALSE, warning=FALSE}
 # Forecast volatility 5 days ahead and add 
 garchforecast <- ugarchforecast(fitORspec = garchfit, 
                      n.ahead = 5)
@@ -175,54 +235,48 @@ print(sigma(garchforecast))
 
 
 
-
-
-# Compute the annualized volatility
-annualvol <- sqrt(252) * sigma(garchfit)
-
-# Compute the 5% vol target weights  
-vt_weights <- 0.05 / annualvol
-
-# Compare the annualized volatility to the portfolio weights in a plot
-plot(merge(annualvol, vt_weights), multi.panel = TRUE)
-
-
 ```
 
 
 
 
-```{r}
+<!-- ```{r, include=TRUE, message=FALSE, warning=FALSE} -->
 
+<!-- # Compute the annualized volatility -->
+<!-- annualvol <- sqrt(252) * sigma(garchfit) -->
 
+<!-- # Compute the 5% vol target weights   -->
+<!-- vt_weights <- 0.05 / annualvol -->
 
-# Plot the return series
-plot(pbr_ret)
+<!-- # Compare the annualized volatility to the portfolio weights in a plot -->
+<!-- plot(merge(annualvol, vt_weights), multi.panel = TRUE) -->
 
-# Specify the garch model to be used
-garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
-                       variance.model = list(model = "sGARCH"),
-                        distribution.model = 'sstd')
 
-# Estimate the model
-garchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
+<!-- ``` -->
 
-# Inspect the coefficients
-coef(garchfit)
 
 
 
+<!-- ```{r} -->
 
 
 
+<!-- # Plot the return series -->
+<!-- plot(pbr_ret) -->
 
+<!-- # Specify the garch model to be used -->
+<!-- garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)), -->
+<!--                        variance.model = list(model = "sGARCH"), -->
+<!--                         distribution.model = 'sstd') -->
 
+<!-- # Estimate the model -->
+<!-- garchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec) -->
 
+<!-- # Inspect the coefficients -->
+<!-- coef(garchfit) -->
 
-```
 
 
-```{r, warning=FALSE}
 
 
 
@@ -230,17 +284,11 @@ coef(garchfit)
 
 
 
+<!-- ``` -->
 
-# Compute the standardized returns
-stdret <- residuals(garchfit, standardize = TRUE)
 
-# Compute the standardized returns using fitted() and sigma()
-stdret <- (pbr_ret - fitted(garchfit)) / sigma(garchfit)
+<!-- ```{r, warning=FALSE} -->
 
-# Load the package PerformanceAnalytics and make the histogram
-library(PerformanceAnalytics)
-chart.Histogram(stdret, methods = c("add.normal","add.density" ), 
-                colorset = c("gray","red","blue"))
 
 
 
@@ -248,9 +296,16 @@ chart.Histogram(stdret, methods = c("add.normal","add.density" ),
 
 
 
-```
+<!-- # Compute the standardized returns -->
+<!-- stdret <- residuals(garchfit, standardize = TRUE) -->
 
+<!-- # Compute the standardized returns using fitted() and sigma() -->
+<!-- stdret <- (pbr_ret - fitted(garchfit)) / sigma(garchfit) -->
 
+<!-- # Load the package PerformanceAnalytics and make the histogram -->
+<!-- library(PerformanceAnalytics) -->
+<!-- chart.Histogram(stdret, methods = c("add.normal","add.density" ),  -->
+<!--                 colorset = c("gray","red","blue")) -->
 
 
 
@@ -258,98 +313,52 @@ chart.Histogram(stdret, methods = c("add.normal","add.density" ),
 
 
 
+<!-- ``` -->
 
 
 
-```{r}
 
 
-# Specify the GJR GARCH model
-garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)),
-                 variance.model = list(model = 'gjrGARCH'),
-                 distribution.model = 'sstd')
 
-# Estimate the model and compute volatility
-gjrgarchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec)
-gjrgarchvol <- sigma(gjrgarchfit)
 
-# Compare volatility
-plotvol <- plot(abs(pbr_ret[-1]), col = "grey")
-plotvol <- addSeries(gjrgarchvol, col = "red", on=1)
-plotvol <- addSeries(sigma(garchfit), col = "blue", on=1)
-plotvol
 
 
 
 
 
-```
+<!-- ```{r} -->
 
 
+<!-- # Specify the GJR GARCH model -->
+<!-- garchspec <- ugarchspec(mean.model = list(armaOrder = c(0,0)), -->
+<!--                  variance.model = list(model = 'gjrGARCH'), -->
+<!--                  distribution.model = 'sstd') -->
 
+<!-- # Estimate the model and compute volatility -->
+<!-- gjrgarchfit <- ugarchfit(data = pbr_ret[-1], spec = garchspec) -->
+<!-- gjrgarchvol <- sigma(gjrgarchfit) -->
 
+<!-- # Compare volatility -->
+<!-- plotvol <- plot(abs(pbr_ret[-1]), col = "grey") -->
+<!-- #plotvol <- addSeries(gjrgarchvol, col = "red", on=1) -->
+<!-- plotvol <- addSeries(sigma(garchfit), col = "blue", on=1) -->
+<!-- plotvol -->
 
 
 
-```{r}
 
 
+<!-- ``` -->
 
 
-# Specify AR(1)-GJR GARCH model
-garchspec <- ugarchspec(mean.model = list(armaOrder = c(1,2) ),
-                        variance.model = list(model = "gjrGARCH"),
-                        distribution.model = "sstd")
+Awesome! Now what to do next? That's why this post is just the part one! There are plenty more things to do! Like measuring our errors, fine tunning our model and fitting it in a portfolio way to use it as some factor for our investments modelling! There's plenty of things. 
 
-# Estimate the model
-garchfit <- ugarchfit(data=pbr_ret[-1],spec = garchspec, mean.model=c(1,0))
 
-# Print the first two coefficients
-coef(garchfit)[c(1:2)]
+# **Final Considerations**
 
+Volatility modelling is a great tool to look at high-frequency problems, the use of it in finances are pretty explored and studies in it are no news, but it's always good to spread the knowledge, trying to format in some real data, taking a look in it's behaviour it's something our friend "Xeroque" loves. As always, keep tunned for the next posts cause i'll be approaching the rest of the problem in the future, but there's so much things to work on that I'll have to search for time for doing that!
 
-
-
-
-```
-
-
-
-
-
-
-
-```{r}
-
-
-
-
-```
-
-
-
-
-
-
-```{r}
-
-
-
-
-```
-
-
-
-
-
-
-```{r}
-
-
-
-
-
-```
+By the way, do you think of a cool problem to work in codes? (Next blog posts will be on python, I'm missing it) Please send me an e-mail and let's talk about it!
 
 
 
